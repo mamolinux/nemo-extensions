@@ -1,0 +1,26 @@
+name: Sync Local Branches
+
+on:
+  schedule:
+    # Schedule for Sync Upstream: Every Saturday at 5:00 UTC
+    - cron: '0 5 * * 6'
+  
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Select the action to run'
+        required: true
+        type: choice
+        options:
+          - Sync Upstream
+
+jobs:
+  # This job handles the Upstream Sync, whether from a schedule or manual trigger
+  upstream_sync_job:
+    if: |
+      (github.event_name == 'schedule' && github.event.schedule == '0 5 * * 6') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'Sync Upstream')
+    uses: mamolinux/github-actions/.github/workflows/sync-with-upstream.yml@main
+    with:
+      upstream: 'linuxmint/nemo-extensions'
+      target_branch: 'master'
